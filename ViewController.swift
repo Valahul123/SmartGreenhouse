@@ -9,11 +9,21 @@
 import UIKit
 import Alamofire
 
+extension UIViewController {
+    func hideKeyboardWhenTappedAround() {
+        let tap: UITapGestureRecognizer =     UITapGestureRecognizer(target: self, action:    #selector(UIViewController.dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+    }
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+}
 
 
 
 class ViewController: UIViewController {
-    
+ 
     func Repetare() {
         Timer.scheduledTimer(timeInterval: 10, target: self,   selector: (#selector(getValues)), userInfo: nil, repeats: true)
     }
@@ -24,6 +34,7 @@ class ViewController: UIViewController {
     var menuShowing = false
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.hideKeyboardWhenTappedAround()
         TextView1.layer.cornerRadius = 5.0
         TextView1.layer.borderWidth = 0.5
         TextView2.layer.cornerRadius = 5.0
@@ -57,6 +68,7 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var menuView: UIView!
     
+   
     @IBOutlet weak var button1: UIButton!
     @IBOutlet weak var button2: UIButton!
     @IBOutlet weak var button3: UIButton!
@@ -120,7 +132,7 @@ class ViewController: UIViewController {
         Alamofire.request("http://192.168.1.3:3000?action=4&sera=1&numeActiune=Preia%20temperatura").responseString { response in switch response.result {
         case .success(let JSON):
             print("Success with JSON: \(JSON)")
-            self.TextView2.text=JSON
+            self.TextView2.text=JSON + "°C"
             
             
             
@@ -154,10 +166,10 @@ class ViewController: UIViewController {
     
     
     
-    
-    @IBAction func Button1(_ sender: Any) {
-        
-        Alamofire.request("http://192.168.1.3:3000?action=0&durata=" + Text1.text! + "&sera=1&numeActiune=Stropire").responseString { response in switch response.result {
+    @IBAction func Button(_ sender: Any) {
+        let double2 = Double(Text1.text!)
+        let val2 = String(double2! * 1000)
+        Alamofire.request("http://192.168.1.3:3000?action=0&durata=" + val2 + "&sera=1&numeActiune=Stropire").responseString { response in switch response.result {
         case .success(let JSON):
             print("Success with JSON: \(JSON)")
             
@@ -173,15 +185,16 @@ class ViewController: UIViewController {
             
             
         }
-        
-        
     }
     
+
     
     
     
     @IBAction func Button2(_ sender: Any) {
-        Alamofire.request("http://192.168.1.3:3000?action=1&durata=" + Text2.text! + "&sera=1&numeActiune=Aerisire").responseString { response in switch response.result {
+       let double = Double(Text2.text!)
+        let val1 = String(double! * 1000)
+        Alamofire.request("http://192.168.1.3:3000?action=1&durata=" + val1 + "&sera=1&numeActiune=Aerisire").responseString { response in switch response.result {
         case .success(let JSON):
             print("Success with JSON: \(JSON)")
             
@@ -204,19 +217,21 @@ class ViewController: UIViewController {
     
     
     @IBAction func Button3(_ sender: Any) {
-        Alamofire.request("http://192.168.1.3:3000?action=2&lum=" + Text3.text! +  "&temp=" + Text4.text! + "&ums=" + Text5.text!  +  "&sera=1&numeActiune=Preia valori" ).responseJSON { response in
+        let double3 = Double(Text5.text!)
+        let val3 = String(double3! * 10)
+        Alamofire.request("http://192.168.1.3:3000?action=2&lum=" + Text3.text! +  "&temp=" + Text4.text! + "&ums=" + val3  +  "&sera=1&numeActiune=Preia%20valori" ).responseJSON { response in
             
             
         }
     }
     
-    
-    
+
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
     
     
 }
