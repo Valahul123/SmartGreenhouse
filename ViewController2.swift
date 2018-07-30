@@ -8,37 +8,20 @@
 
 import UIKit
 import Alamofire
-import SwiftCharts
+import UserNotifications
+
 
 class ViewController2: UIViewController {
+    func Repetare() {
+        Timer.scheduledTimer(timeInterval: 3, target: self,   selector: (#selector(notificari)), userInfo: nil, repeats: true)
+    }
 
     @IBOutlet weak var textView: UITextView!
-    var chartView:LineChart!
     override func viewDidLoad() {
         
         super.viewDidLoad()
-     /*
-        let chartConfig = ChartConfigXY(
-            xAxisConfig:ChartAxisConfig(from: 0, to: 12, by: 2),
-            yAxisConfig: ChartAxisConfig(from: 0, to: 12, by: 2)
-        )
-        
-        let frame = CGRect(x: 0, y: 100, width: self.view.frame.width-20, height: 300)
-        
-        let chart = LineChart(
-            frame: frame,
-            chartConfig: chartConfig,
-            xTitle: "",
-            yTitle: "",
-            lines: [
-                (chartPoints: [(2.0, 10.6), (4.2, 5.1), (7.3, 3.0), (8.1, 5.5), (14.0, 8.0)], color: UIColor.red),
-                (chartPoints: [(2.0, 2.6), (4.2, 4.1), (7.3, 1.0), (8.1, 11.5), (14.0, 3.0)], color: UIColor.blue)
-            ]
-        )
-        
-        self.view.addSubview(chart.view)
-        self.chartView = chart
- */
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge], completionHandler:{didAllow, error in
+        } )
         // Do any additional setup after loading the view.
         Alamofire.request("http://192.168.1.3:3000/logs").responseString { response in switch response.result {
         case .success(let JSON):
@@ -56,7 +39,40 @@ class ViewController2: UIViewController {
             
             
         }
+        Repetare()
     }
+    @objc func notificari() {
+       
+        Alamofire.request("http://192.168.1.3:3000?action=7&sera=1").responseString { response in switch response.result {
+        case .success(let JSON):
+            print("Success with JSON: \(JSON)")
+            var json : String = JSON
+            if(json == "da"){
+                let content = UNMutableNotificationContent()
+                content.title = "Alerta!!!"
+                content.body = "fara apa"
+                content.badge = 1;
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
+                let request = UNNotificationRequest(identifier: "AlertaUmiditate", content: content, trigger: trigger)
+                
+                UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+            }
+            
+            
+        case .failure(let error):
+            print("Request failed with error: \(error)")
+            }
+            
+            
+            
+            
+            
+            
+        }
+ 
+     
+    }
+ 
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
