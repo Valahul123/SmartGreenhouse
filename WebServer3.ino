@@ -21,12 +21,16 @@ int dreapta=1;
 int var1,var2;
 int start=1;
 int intuneric=0;
+int nr=0;
+int val=0;
 unsigned long previousTimer1=0;
 unsigned long previousTimer2=0;
 unsigned long previousTimer3=0;
+unsigned long previousTimer4=0;
 const long interval = 30000 ;
 const long interval2 = 60000 ;
 const long interval3 = 30000 ;
+const long interval4 = 60000 ;
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 IPAddress ip(192,168,1,177);
@@ -86,18 +90,18 @@ void setup() {
   delay(2000);
 }
 
-int a = 0, b = 0, part, total;
-float percentage;
+int a = 0, b = 0, part, total , part2 , total2;
+float percentage , percentage2;
 void loop() {
   //cod pentru luminozitate ajustabila
   
   int l = analogRead(A2)/ 4;
   int lpanou = analogRead(A4)/ 4;
-  /*Serial.println(lpanou);
+ /* Serial.println(lpanou);
   Serial.print(l);
   Serial.print("-");
   Serial.println(lMin);
-  */
+ */ 
   if(l < lMin)
   {
     analogWrite(7, (lMin - l) % 255);
@@ -106,10 +110,14 @@ void loop() {
     digitalWrite(7, 0);
  
   
-        if(lpanou == 0){
+        if(lpanou <25){
+         unsigned long currentTimer4 = millis();
+        if(currentTimer4 - previousTimer4 >= interval4){
+          previousTimer4 = currentTimer4;
           intuneric=1;
         }
-              if((intuneric==1) && (lpanou > 0)){
+        }
+              if((intuneric==1) && (lpanou > 30)){
                 delay(1000);
              for(pos = 10; pos < 170; pos += 1){                                  
                 myservo2.write(pos);              
@@ -183,17 +191,24 @@ void loop() {
 
    
   
-  /*
+  
   int t = readTempInCelsius(10, 3);
   Serial.print(t);
   Serial.print("-");
   Serial.println(tempMax);
-  if((t > tempMax) && (aerisit==0)){
+  if (val==t){
+    nr++;
+  }
+  val = t;
+  if(nr == 10){ 
+  if((val > tempMax) && (aerisit==0)){
     aerisit=1;
     myservo.write(90);
   }
+    nr=0;
+  }
 
-  */
+  
   if(aerisit==1){
   unsigned long currentTimer3 = millis();
         if(currentTimer3 - previousTimer3 >= interval3 ){
@@ -276,6 +291,7 @@ void loop() {
           tempMax = var[3];
           umaMin = var[4];
           umsMin = var[5];
+          int uMin=umsMin;
           Serial.println(lMin);
           Serial.println(tempMax);
           Serial.println(umaMin);
@@ -312,23 +328,8 @@ void loop() {
             break;
             case 4:
                 client.print(readTempInCelsius(10, 3));
-                client.println("°C");
+               
             break;
-            /*
-            case 5:
-                  part = analogRead(A4) - 300;
-                  total = 600;
-                  while(part > 600){
-                    part--;
-                  }
-                  while(part < 0){
-                    part++;
-                  }
-                  percentage = (float)part/total * 100.0;
-                  client.println(percentage);
-                  client.print('%');
-            break;
-            */
             case 6:
                   part = analogRead(A1);
                   total = 880;
@@ -342,7 +343,16 @@ void loop() {
                   client.print(percentage);
                   client.println('%');
             break;
-          }
+            case 7:       
+                 
+                if(umsMin-20 > analogRead(A1)){
+                    client.print("da");
+                }
+           
+           break;
+                  
+           } 
+ 
           break;
         }
         if (c == '\n') {
