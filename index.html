@@ -272,7 +272,7 @@
 
                 $.get('http://192.168.1.3:3000?action=4&sera=' + document.getElementById("lista").value + "&numeActiune=Preia temperatura", function(response) {
 
-                    $("#temperatura").html(response);
+                    $("#temperatura").html(response + "°C");
                 })
 
         
